@@ -81,7 +81,7 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate     # Windows
 ```
-3. d
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
@@ -107,15 +107,25 @@ Prediction Tool: Input your data for personalized obesity risk assessment
 Recommendations: Get customized health advice
 
 Project Structure
+
 obesity-prediction/
+
 ├── data/                   # Dataset files
+
 │   └── obesity_train.csv
+
 ├── app.py                  # Main Streamlit application
+
 ├── utils/                  # Utility functions
+
 │   ├── preprocessing.py    # Data cleaning and feature engineering
+
 │   └── visualization.py    # Plotting functions
+
 ├── models/                 # Saved model files
+
 ├── requirements.txt        # Python dependencies
+
 └── README.md               # Project documentation
 
 
