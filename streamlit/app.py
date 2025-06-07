@@ -10,7 +10,7 @@ from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
-from sklearn.metrics import mean_absolute_error, r2_score, accuracy_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, roc_curve, roc_auc_score
+from sklearn.metrics import mean_absolute_error, r2_score, accuracy_score, precision_score, f1_score, confusion_matrix, ConfusionMatrixDisplay, roc_curve, roc_auc_score
 
 # Загрузка данных
 @st.cache_data
@@ -246,7 +246,7 @@ def scenario_prediction(data, models, scaler):
     input_df['Sedentary_Index'] = (input_df['FAF'] + input_df['TUE']) / 2
     
 
-        # Масштабирование признаков
+    # Масштабирование признаков
     scale_cols = ['FCVC', 'NCP', 'CH2O', 'FAF', 'TUE', 'CALC', 'MTRANS', 'CAEC']
     sc1 = MinMaxScaler()
     sc1_data = sc1.fit_transform(input_df[scale_cols])
@@ -288,7 +288,10 @@ def scenario_prediction(data, models, scaler):
             proba = model.predict_proba(X_pred)
             
             st.subheader('Результат предсказания')
-            st.write(f'Предсказанный класс: {prediction[0]}')
+            if prediction[0]==0:
+                st.write(f'Предсказанный класс: нормальный вес')
+            else:
+                st.write(f'Предсказанный класс: ожирение')
             
             fig, ax = plt.subplots(figsize=(8,4))
             ax.bar(model.classes_, proba[0])
@@ -321,8 +324,8 @@ def main():
     data_load_state.text('')
     
     # Создание вкладок
-    tabs = ["Обзор данных", "Градиентный бустинг (регрессия)", "Градиентный бустинг (классификация)",
-            "Случайный лес (регрессия)", "Случайный лес (классификация)", 
+    tabs = ["Обзор данных", "Градиентный бустинг",
+            "Случайный лес", 
             "Метод ближайших соседей", "Подбор параметров KNN", "Сравнение моделей",
          "Предсказание ожирения", "Рекомендации"]
     selected_tab = st.sidebar.radio("Выберите раздел:", tabs)
@@ -463,14 +466,18 @@ def main():
             y_pred = model.predict(X_test)
             accuracy = accuracy_score(y_test, y_pred)
             f1 = f1_score(y_test, y_pred, average='weighted')
+            pr = precision_score(y_test, y_pred, average='weighted')
+            rc = roc_auc_score(y_test, y_pred, average='weighted')
             
             st.subheader("Метрики качества")
             st.write(f"Точность (Accuracy): {accuracy:.2f}")
             st.write(f"F1-мера: {f1:.2f}")
+            st.write(f"ROC-AUC: {rc:.2f}")
+            st.write(f"Precision-мера: {pr:.2f}")
             
             st.subheader("Матрица ошибок")
             cm = confusion_matrix(y_test, y_pred)
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(2, 1))
             disp = ConfusionMatrixDisplay(confusion_matrix=cm, 
                                          display_labels=model.classes_)
             disp.plot(ax=ax)
